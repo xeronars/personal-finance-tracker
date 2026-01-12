@@ -1,2 +1,10 @@
-# personal-finance-tracker
-A Flask-based web application to track personal expenses, categories, and monthly summaries using PostgreSQL.
+# Personal Finance Tracker
+
+A Flask-based web application to track expenses and categories with PostgreSQL.
+
+Tech Stack:
+- Python
+- Flask
+- PostgreSQL
+
+Status: In Progress
