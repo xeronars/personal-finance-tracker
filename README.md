@@ -8,3 +8,9 @@ Tech Stack:
 - PostgreSQL
 
 Status: In Progress
+
+personal-finance-tracker/
+├── app.py
+├── requirements.txt
+├── venv/
+└── README.md
