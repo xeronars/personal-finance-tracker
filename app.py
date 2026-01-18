@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date
 
@@ -26,6 +26,21 @@ class Expense(db.Model):
 @app.route("/")
 def home():
     return "Flask is running!"
+
+@app.route("/categories", methods=["POST"])
+def add_category():
+    data = request.get_json()
+    name = data.get("name")
+
+    if not name:
+        return jsonify({"error": "Category name is required"}), 400
+    
+    category = Category(name=name)
+    db.session.add(category)
+    db.session.commit()
+    return jsonify({"message": "Category added", 
+                    "id": category.id,
+                    "name": category.name}), 201
 
 if __name__ == "__main__":
     with app.app_context():
