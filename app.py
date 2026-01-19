@@ -42,6 +42,32 @@ def add_category():
                     "id": category.id,
                     "name": category.name}), 201
 
+@app.route("/expenses", methods=["POST"])
+def add_expense():
+    data = request.get_json()
+
+    amount = data.get("amount")
+    description = data.get("description")
+    category_id = data.get("category_id")
+
+    if not amount or not category_id:
+        return jsonify({"error": "Amount and category_id are required"}), 400
+    
+    expense = Expense(
+        amount=amount,
+        description=description,
+        date=date.today(),
+        category_id=category_id
+    )
+
+    db.session.add(expense)
+    db.session.commit()
+
+    return jsonify({
+        "message": "Expense added",
+        "id": expense.id,
+        "amount": expense.amount,
+    }), 201
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
