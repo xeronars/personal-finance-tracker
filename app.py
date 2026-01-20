@@ -23,6 +23,15 @@ class Expense(db.Model):
         db.ForeignKey("category.id")
     )
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "amount": self.amount,
+            "description": self.description,
+            "date": self.date,
+            "category_id": self.category_id
+        }
+
 @app.route("/")
 def home():
     return "Flask is running!"
@@ -68,6 +77,13 @@ def add_expense():
         "id": expense.id,
         "amount": expense.amount,
     }), 201
+
+@app.route("/expenses", methods=["GET"])
+def get_expenses():
+    expenses = Expense.query.all()
+    result = [expense.to_dict() for expense in expenses]
+    return jsonify(result), 200
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
