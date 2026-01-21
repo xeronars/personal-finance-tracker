@@ -84,6 +84,13 @@ def get_expenses():
     result = [expense.to_dict() for expense in expenses]
     return jsonify(result), 200
 
+@app.route("/expenses/<int:id>", methods=["GET"])
+def get_expense(id):
+    expense = Expense.query.get(id)
+    if not expense:
+        return jsonify({"error": "Expense not found"}), 404
+    return jsonify(expense.to_dict()), 200
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
