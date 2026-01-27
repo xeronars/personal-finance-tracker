@@ -55,11 +55,14 @@ def add_category():
 def add_expense():
     data = request.get_json()
 
+    if not data:
+        return jsonify({"error": "Invalid JSON"}), 400
+    
     amount = data.get("amount")
     description = data.get("description")
     category_id = data.get("category_id")
 
-    if not amount or not category_id:
+    if amount is None or category_id is None:
         return jsonify({"error": "Amount and category_id are required"}), 400
     
     expense = Expense(
@@ -74,8 +77,7 @@ def add_expense():
 
     return jsonify({
         "message": "Expense added",
-        "id": expense.id,
-        "amount": expense.amount,
+        "expense": expense.to_dict()
     }), 201
 
 @app.route("/expenses", methods=["GET"])
@@ -104,6 +106,9 @@ def delete_expense(id):
 def update_expense(id):
     data = request.get_json()
 
+    if not data:
+        return jsonify({"error": "Invalid JSON"}), 400
+    
     expense = Expense.query.get(id)
 
     if not expense:
@@ -130,7 +135,19 @@ def update_expense(id):
         "description": expense.description,
         "category_id": expense.category_id
     })  
- 
+
+@app.route("/expenses/total", methods=["GET"])
+def get_total_spent():
+    expenses = Expense.query.all()
+
+    total = 0
+    for expense in expenses:
+        total += expense.amount
+
+    return jsonify({
+        "total_spent": total
+    }), 200
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
