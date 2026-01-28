@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date
+from sqlalchemy import func, extract
 
 app = Flask(__name__)
 
@@ -147,6 +148,29 @@ def get_total_spent():
     return jsonify({
         "total_spent": total
     }), 200
+
+@app.route("/expenses/summary/month", methods=["GET"])
+def monthly_summary():
+    results = (
+        db.session.query(
+            extract("year", Expense.date).label("year"),
+            extract("month", Expense.date).label("month"),
+            func.sum(Expense.amount).label("total")
+        )
+        .group_by("year", "month")
+        .order_by("year", "month")
+        .all()
+    )
+
+    summary = []
+    for row in results:
+        summary.append({
+            "year": int(row.year),
+            "month": int(row.month),
+            "total": float(row.total)
+        })
+    
+    return jsonify(summary), 200
 
 if __name__ == "__main__":
     with app.app_context():
