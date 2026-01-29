@@ -83,7 +83,13 @@ def add_expense():
 
 @app.route("/expenses", methods=["GET"])
 def get_expenses():
-    expenses = Expense.query.all()
+    category_id = request.args.get("category_id")
+
+    if category_id:
+        expenses = Expense.query.filter_by(category_id=category_id).all()
+    else:
+        expenses = Expense.query.all()
+        
     result = [expense.to_dict() for expense in expenses]
     return jsonify(result), 200
 
