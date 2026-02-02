@@ -29,9 +29,26 @@ class Expense(db.Model):
             "id": self.id,
             "amount": self.amount,
             "description": self.description,
-            "date": self.date,
+            "date": self.date.isoformat() if self.date else None,
             "category_id": self.category_id
         }
+
+def validate_expense(data):
+    if not data:
+        return "Request bod must be JSON"
+    
+    if "amount" not in data:
+        return "Amount is required"
+    
+    if "category_id" not in data:
+        return "Category ID is required"
+    
+    try:
+        float(data["amount"])
+    except:
+        return "Amount must be a number"
+    
+    return None
 
 @app.route("/")
 def home():
@@ -56,8 +73,9 @@ def add_category():
 def add_expense():
     data = request.get_json()
 
-    if not data:
-        return jsonify({"error": "Invalid JSON"}), 400
+    error = validate_expense(data)
+    if error:
+        return {"error": error}, 400
     
     amount = data.get("amount")
     description = data.get("description")
